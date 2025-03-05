@@ -16,17 +16,32 @@ def markdown_to_blocks(markdown):
     return results
 
 def block_to_block_type(markdown):
+    if not markdown:
+        return BlockType.PARAGRAPH
+
     if markdown[0] == "#":
-        return BlockType.HEADING
+        heading_level = 0
+        for char in markdown:
+            if char == '#':
+                heading_level += 1
+            else:
+                break
+        if heading_level <= 6 and heading_level > 0 and markdown[heading_level] == " ":
+            return BlockType.HEADING
     
-    elif markdown.startswith("```") and markdown.endswith("```"):
+    if markdown.startswith("```") and markdown.endswith("```"):
         return BlockType.CODE
     
-    elif markdown[0] == ">":
+    lines = markdown.split("\n")
+
+    if all(line.startswith(">") for line in lines):
         return BlockType.QUOTE
-    elif markdown[:1] == "- ":
+
+    elif all(line.startswith("- ") for line in lines):
         return BlockType.UNORDERED_LIST
-    elif markdown[0].isdigit() and markdown[1:3] == ". ":
+
+    elif all(line.startswith(f"{i + 1}. ") for i, line in enumerate(lines)):
         return BlockType.ORDERED_LIST
+
     else:
         return BlockType.PARAGRAPH
