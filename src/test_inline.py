@@ -2,7 +2,7 @@ import unittest
 
 from textnode import TextNode, TextType
 from inline import split_nodes_delimiter, split_nodes_image, split_nodes_link, extract_markdown_images, extract_markdown_links, text_to_textnodes
-
+from website import extract_title
 
 class TestInline(unittest.TestCase):
 
@@ -125,6 +125,32 @@ class TestInline(unittest.TestCase):
             ],
             new_nodes,
         )
+
+    def test_simple_title(self):
+        markdown = "# Simple Title"
+        self.assertEqual(extract_title(markdown), "Simple Title")
+    
+    def test_title_with_spaces(self):
+        markdown = "#    Spaced    Title    "
+        self.assertEqual(extract_title(markdown), "Spaced    Title")
+    
+    def test_title_not_at_beginning(self):
+        markdown = "Some text before\n# Title in the middle\nSome text after"
+        self.assertEqual(extract_title(markdown), "Title in the middle")
+    
+    def test_multiple_titles(self):
+        markdown = "# First Title\n## Second Title\n# Another First Title"
+        self.assertEqual(extract_title(markdown), "First Title")
+    
+    def test_no_title(self):
+        markdown = "No title here\nJust some text\n## Second level header"
+        with self.assertRaises(Exception):
+            extract_title(markdown)
+    
+    def test_empty_string(self):
+        markdown = ""
+        with self.assertRaises(Exception):
+            extract_title(markdown)
 
 if __name__ == "__main__":
     unittest.main()
