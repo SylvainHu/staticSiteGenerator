@@ -1,21 +1,26 @@
 import os
+import sys
 import shutil
 from textnode import TextNode, TextType
 from website import copy_from_static_to_public, generate_pages_recursive
 
-dir_path_static = "./static"
-dir_path_public = "./public"
-dir_path_content = "./content"
+static_dir = "./static"
+output_dir = "./docs"
+content_dir = "./content"
 template_path = "./template.html"
+
+basepath = "/"
+if len(sys.argv) > 1:
+    basepath = sys.argv[1]
 
 
 def main():
 
-    if os.path.exists(dir_path_public):
-        shutil.rmtree(dir_path_public)
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
 
-    copy_from_static_to_public(dir_path_static, dir_path_public)
-    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+    copy_from_static_to_public(static_dir, output_dir)
+    generate_pages_recursive(content_dir, template_path, output_dir, basepath)
 
 if __name__ == '__main__':
     main()
